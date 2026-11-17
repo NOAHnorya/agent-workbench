@@ -1,0 +1,14 @@
+# 本机配置：从 workbench.example.json 生成，可能含你自己的 MCP 参数
+workbench.json
+
+# 运行产生的数据：任务卡、交接总结、运行日志、事件日志、截图
+projects/
+logs/
+demo/
+backups/
+
+# 打包产物和系统文件
+*.tar.gz
+__pycache__/
+*.pyc
+.DS_Store

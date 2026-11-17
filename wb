@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# 多 agent 工作台命令入口：./wb <命令>，./wb -h 查看全部命令
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export WB_ROOT="${WB_ROOT:-$DIR}"
+exec python3 -c 'import sys; sys.path.insert(0, sys.argv.pop(1)); from workbench.cli import main; main()' "$DIR" "$@"

@@ -1,0 +1,108 @@
+{
+  "port": 8765,
+  "poll_seconds": 2,
+  "siliconflow": {
+    "base_url": "https://api.siliconflow.com/v1",
+    "api_key_env": "SILICONFLOW_API_KEY",
+    "keychain_account": "agent-workbench"
+  },
+  "log_reader": {
+    "agent_id": "qwen",
+    "model": "Qwen/Qwen3.8-27B",
+    "params": {
+      "enable_thinking": false
+    }
+  },
+  "agents": {
+    "claude": {
+      "name": "Claude Code",
+      "role": "规划 · 开发",
+      "color": "#CF6C35",
+      "kind": "cli",
+      "cmd": [
+        "claude",
+        "-p",
+        "{prompt}",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--permission-mode",
+        "acceptEdits",
+        "--allowedTools",
+        "Bash,Read,Edit,Write,MultiEdit,Glob,Grep"
+      ],
+      "max_parallel": 1,
+      "timeout": 1800,
+      "cooldown_minutes": 60,
+      "quota_patterns": [
+        "usage limit",
+        "limit reached",
+        "rate_limit_error"
+      ],
+      "login_hint": "claude auth login"
+    },
+    "codex": {
+      "name": "Codex",
+      "role": "资产工位",
+      "color": "#1F8D7C",
+      "kind": "cli",
+      "cmd": [
+        "codex",
+        "exec",
+        "-c",
+        "sandbox_workspace_write.network_access=true",
+        "--json",
+        "--skip-git-repo-check",
+        "-C",
+        "{cwd}",
+        "-s",
+        "workspace-write",
+        "-o",
+        "{outfile}",
+        "{prompt}"
+      ],
+      "max_parallel": 1,
+      "timeout": 1800,
+      "cooldown_minutes": 60,
+      "quota_patterns": [
+        "usage limit",
+        "rate limit",
+        "quota"
+      ],
+      "login_hint": "codex login"
+    },
+    "kimi": {
+      "name": "Kimi Code",
+      "role": "备用工位",
+      "color": "#5552C6",
+      "kind": "cli",
+      "cmd": [
+        "kimi",
+        "-p",
+        "{prompt}",
+        "--output-format",
+        "stream-json"
+      ],
+      "max_parallel": 1,
+      "timeout": 1800,
+      "cooldown_minutes": 60,
+      "quota_patterns": [
+        "usage limit",
+        "rate limit",
+        "quota",
+        "余额不足"
+      ],
+      "transient_exit_codes": [
+        75
+      ]
+    },
+    "qwen": {
+      "name": "Qwen3.8-27B",
+      "role": "日志查询 · 摘要",
+      "color": "#7A8A26",
+      "kind": "siliconflow",
+      "model": "Qwen/Qwen3.8-27B",
+      "max_parallel": 4
+    }
+  }
+}

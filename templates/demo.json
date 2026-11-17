@@ -1,0 +1,214 @@
+[
+  {
+    "id": "fashion",
+    "title": "服装设计 · 领型",
+    "color": "#C2477A",
+    "priority": 1,
+    "cards": [
+      {
+        "id": "plan_collar",
+        "title": "拆领型部件清单",
+        "assignee": "claude",
+        "goal": "按术语库拆出 V 领、圆领、方领三种领型并写规格",
+        "mock": {
+          "seconds": 6,
+          "summary": {
+            "did": "拆出三种领型，各写一张资产卡。",
+            "why": "先做最常见的三种，验证流水线。",
+            "next": "挂点统一叫 neck_anchor，原点在颈窝；参考图用纯色背景。"
+          }
+        }
+      },
+      {
+        "id": "model_base",
+        "title": "模特底模风格",
+        "assignee": "claude",
+        "goal": "定下预览模特的呈现风格，给后面的领型预览用",
+        "mock": {
+          "seconds": 4,
+          "blocked_first": {
+            "question": "预览模特用哪种呈现风格？三张样图在 refs/ 里，推荐的排第一。",
+            "options": [
+              "写实灰模：最接近成衣效果，面数高、加载慢约 2 秒（样图 refs/base_real.png）",
+              "线稿人台：加载最快，领型轮廓最清楚，但看不出面料（样图 refs/base_line.png）",
+              "低模卡通：风格讨喜，比例不标准，专业用户会介意（样图 refs/base_toon.png）"
+            ],
+            "artifacts": [
+              "refs/base_real.png",
+              "refs/base_line.png",
+              "refs/base_toon.png"
+            ]
+          },
+          "summary": {
+            "next": "预览里用选定的底模；挂点 neck_anchor 已标在颈窝。",
+            "did": "底模风格已按主人的选择定稿。",
+            "why": "风格由主人在三个样例里选定。"
+          }
+        }
+      },
+      {
+        "id": "collar_v",
+        "title": "V 领 3D 资产",
+        "assignee": "codex",
+        "fallback": [
+          "kimi"
+        ],
+        "depends_on": [
+          "plan_collar"
+        ],
+        "goal": "出参考图并用 Hi3D 生成 V 领模型",
+        "check": "grep -q ok assets/collar_v.glb",
+        "mock": {
+          "seconds": 6,
+          "fail_first": true,
+          "job_seconds": 6,
+          "artifacts": {
+            "assets/collar_v.glb": "ok"
+          },
+          "summary": {
+            "why": "参考图改成正面视角，左右对称，挂点算得准。",
+            "risks": "开口比规格浅约 0.5 cm。"
+          }
+        }
+      },
+      {
+        "id": "collar_round",
+        "title": "圆领 3D 资产",
+        "assignee": "codex",
+        "fallback": [
+          "kimi"
+        ],
+        "depends_on": [
+          "plan_collar"
+        ],
+        "goal": "出参考图并用 Hi3D 生成圆领模型",
+        "check": "grep -q ok assets/collar_round.glb",
+        "mock": {
+          "seconds": 5,
+          "job_seconds": 7,
+          "artifacts": {
+            "assets/collar_round.glb": "ok"
+          }
+        }
+      },
+      {
+        "id": "collar_square",
+        "title": "方领 3D 资产",
+        "assignee": "codex",
+        "fallback": [
+          "kimi"
+        ],
+        "depends_on": [
+          "plan_collar"
+        ],
+        "goal": "出参考图并用 Hi3D 生成方领模型",
+        "check": "grep -q ok assets/collar_square.glb",
+        "mock": {
+          "seconds": 5,
+          "quota_out": [
+            "codex"
+          ],
+          "job_seconds": 5,
+          "artifacts": {
+            "assets/collar_square.glb": "ok"
+          }
+        }
+      },
+      {
+        "id": "preview_collars",
+        "title": "领型接入实时预览",
+        "assignee": "claude",
+        "depends_on": [
+          "collar_v",
+          "collar_round",
+          "collar_square",
+          "model_base"
+        ],
+        "goal": "按 neck_anchor 把三种领型接到预览模特上",
+        "mock": {
+          "seconds": 7,
+          "ask": "V 领为什么被打回过？",
+          "ask_task": "collar_v"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ripperdoc",
+    "title": "赛博义体诊所",
+    "color": "#2F7FD1",
+    "priority": 0,
+    "cards": [
+      {
+        "id": "plan_props",
+        "title": "拆诊所道具清单",
+        "assignee": "claude",
+        "goal": "列出手术台和义体货架两件道具及面数预算",
+        "mock": {
+          "seconds": 5
+        }
+      },
+      {
+        "id": "prop_table",
+        "title": "手术台 3D 资产",
+        "assignee": "codex",
+        "fallback": [
+          "kimi"
+        ],
+        "depends_on": [
+          "plan_props"
+        ],
+        "goal": "生成义体手术台模型，面数不超过 15k",
+        "check": "grep -q ok assets/surgery_table.glb",
+        "mock": {
+          "seconds": 5,
+          "job_seconds": 6,
+          "artifacts": {
+            "assets/surgery_table.glb": "ok"
+          }
+        }
+      },
+      {
+        "id": "prop_shelf",
+        "title": "义体货架 3D 资产",
+        "assignee": "kimi",
+        "fallback": [
+          "codex"
+        ],
+        "depends_on": [
+          "plan_props"
+        ],
+        "goal": "生成义体货架模型",
+        "check": "grep -q ok assets/shelf.glb",
+        "mock": {
+          "seconds": 5,
+          "job_seconds": 5,
+          "artifacts": {
+            "assets/shelf.glb": "ok"
+          }
+        }
+      },
+      {
+        "id": "key_art",
+        "title": "主视觉海报",
+        "assignee": "chatgpt",
+        "mode": "manual",
+        "goal": "在 ChatGPT 网页版出一张主视觉，存到 assets/key_art.png，然后在收件箱里标记完成"
+      },
+      {
+        "id": "place_props",
+        "title": "道具摆进场景",
+        "assignee": "claude",
+        "review": true,
+        "depends_on": [
+          "prop_table",
+          "prop_shelf"
+        ],
+        "goal": "把两件道具放进诊所场景并调好灯光",
+        "mock": {
+          "seconds": 6
+        }
+      }
+    ]
+  }
+]
